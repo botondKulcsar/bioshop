@@ -1,0 +1,9 @@
+{
+    "database": {
+        "dbType": "mongodb://",
+        "username": "",
+        "password": "",
+        "host": "mongo:27017/myFirstDatabase?retryWrites=true&w=majority"
+    },
+    "port": 3000
+}

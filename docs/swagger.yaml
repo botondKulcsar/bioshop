@@ -1,0 +1,543 @@
+openapi: 3.0.0
+info: 
+  title: Bio-Shop API
+  description: This is the server for Bio-Shop.
+  version: 1.0.0
+
+  contact:
+    name: Kulcsár Botond
+    email: bkulcsar@gmx.com
+
+servers:
+  - url: http://localhost:3000
+    description: This is the development server of the Bio-Shop e-commerce webapplication
+
+paths:
+  /api/register:
+    post:
+      summary: Creates a customer
+      tags: 
+        - auth
+      description: Customer registeration
+      requestBody:
+        $ref: '#/components/requestBodies/CustomerBody'
+      responses:
+        '201':
+          description: Created
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+          
+  /api/login:
+    post:
+      summary: customer login
+      tags: 
+        - auth
+      description: Customer logs in providing email and password
+      requestBody:
+        $ref: '#/components/requestBodies/LoginBody'
+      responses:
+        '200':
+          description: returns customer data along with access token, refresh token and access token expiry
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/refresh:
+    post:
+      summary: new access token request
+      tags: 
+        - auth
+      description: Client requests a new access token by sending a valid refresh token
+      requestBody:
+        $ref: '#/components/requestBodies/RefreshBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/NewAccessToken'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          description: Forbidden - token not found in db or is expired
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/logout:
+    post:
+      summary: customer logs out
+      tags: 
+        - auth
+      description: customer logs out by sending a valid refresh token
+      requestBody:
+        $ref: '#/components/requestBodies/RefreshBody'
+      responses:
+        '200':
+          description: Client logged out
+          content: 
+            application/json:
+              schema: 
+                type: object
+        '401':
+          description: Token not found in db. Custumer must have logged out already.
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: refresh token missing
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        
+  /api/products:
+    get:
+      summary: Returns a list of products of a given category or all products
+      tags:
+        - product
+      description: This endpoint returns all the available products in the database or just a category of products - specified in query
+      parameters: 
+        - in: query
+          name: category
+          schema: 
+            type: string
+          required: false
+      responses:
+        '200':
+          description: A JSON array of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/products/{productId}:
+    get:
+      summary: Returns a product by ID.
+      tags:
+        - product
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to return
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A product object
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/orders:
+    get:
+      summary: Returns a list of orders of a customer
+      tags:
+        - order
+      description: Returns a list of orders of the logged in customer if the customerId in querystring matches the logged in customer's _id
+      security:
+        - bearerAuth: []
+      parameters: 
+        - in: query
+          name: customerId
+          schema: 
+            type: string
+          required: true
+        - in: query
+          name: __sort
+          schema: 
+            type: string
+          required: false
+        - in: query
+          name: _order
+          schema: 
+            type: string
+          required: false
+      responses: 
+        '200':
+          description: a JSON list of orders of the logged in customer if the customerId in query belongs to the customer
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Order'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      summary: create a new order
+      tags:
+        - order
+      description: customer posts a new order
+      security:
+        - bearerAuth: []
+      requestBody:
+        $ref: '#/components/requestBodies/OrderBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/OrderCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/customers/{customerId}:
+    get:
+      summary: returns the data of a single customer
+      tags:
+        - customer
+      description: returns the data of the logged in customer if the customerId in the params matches the one of the authenticated customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customerId
+          description: The ID of the customer to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: a JSON object containing the data of the logged in customer
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: customer updates his/her data
+      tags:
+        - customer
+      description: updates the data of the logged in customer if the customerId in the params matches the one of the authenticated customer
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customerId
+          description: The ID of the customer to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateCustomerBody'
+      responses:
+        '200':
+          description: a JSON object containing the updated data of the user
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid or email and password do not match
+
+    InternalServerError:
+      description: Internal server error
+      content: 
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/Error'
+
+    BadRequest:
+      description: Request body is missing required parameters
+      content: 
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: requested item was not found
+      content:
+        application/json:
+          schema: 
+            $ref: '#/components/schemas/Error'
+
+    NewAccessToken:
+      description: refresh token is valid and a new access token is generated
+      content: 
+        application/json:
+          schema:
+            type: object
+            properties:
+              accessToken: 
+                type: string
+              accessExpiresAt: 
+                type: number
+      
+    OrderCreated:
+      description: Order created
+      content: 
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Order'
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  requestBodies:
+
+    CustomerBody:
+      description: A JSON object containing Customer information
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Customer'
+        
+    LoginBody:
+      description: A JSON object containing email and password
+      required: true
+      content:  
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+
+    RefreshBody:
+      description: A JSON object containing a refresh token
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Token'
+
+    OrderBody:
+      description: A JSON object containg the order of the logged in customer
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Order'
+
+    UpdateCustomerBody:
+      description: A JSON object containing some data about a customer he/she wishes to update
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+              lastName:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              address:
+                $ref: '#/components/schemas/Address'
+              phone:
+                type: string
+
+  schemas:
+
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        number:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        ZIP:
+          type: string
+      required:
+        - street
+        - number
+        - city
+        - state
+        - ZIP
+
+    DeliveryAddress:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        street:
+          type: string
+        number:
+          type: string
+        ZIP:
+          type: string
+        city:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - phone
+        - street
+        - number
+        - ZIP
+        - city
+
+    Customer:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        address:
+          $ref: '#/components/schemas/Address'
+        phone:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+        - address
+        - phone
+
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: number
+        description:
+          type: string
+        longDescription:
+          type: string
+        imageUrl:
+          type: string
+      required:
+        - name
+        - category
+        - price
+        - quantity
+        - description
+        - imageUrl
+
+    Order:
+      type: object
+      properties:
+        customerId:
+          type: string
+        deliveryAddress:
+          $ref: '#/components/schemas/DeliveryAddress'
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              price:
+                type: number
+              quantity:
+                type: number
+        total:
+          type: number
+        shipping:
+          type: number
+      required:
+        - customerId
+        - deliveryAddress
+        - products
+        - total
+        - shipping
+
+    Token:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+
+    Error: 
+      type: object
+      properties:
+        hasError:
+          type: boolean
+        message:
+          type: string
+      required:
+        - hasError
+        - message
+
+            
+
+        
+
+        

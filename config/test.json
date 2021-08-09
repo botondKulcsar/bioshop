@@ -1,0 +1,9 @@
+{
+    "database": {
+        "dbType": "mongodb://",
+        "username": "",
+        "password": "",
+        "host": "127.0.0.1:27017/remekTest"
+    },
+    "port": 3000
+}

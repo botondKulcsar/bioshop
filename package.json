@@ -1,0 +1,42 @@
+{
+  "name": "bio-shop-api",
+  "version": "1.0.0",
+  "description": "API for Bio-Shop webapp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "docker:build":"docker build -t remek:latest .",
+    "docker-compose:up": "docker-compose up -d",
+    "docker-compose:down": "docker-compose down",
+    "start:server-prod": "cross-env NODE_ENV=production node src/index.js",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.6",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "http-errors": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.2",
+    "mongoose-id-validator": "^0.6.0",
+    "morgan": "^1.10.0",
+    "swagger-ui-express": "^4.1.6",
+    "winston": "^3.3.3",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "jest": "^27.0.6",
+    "jest-mock-req-res": "^1.0.2",
+    "nodemon": "^2.0.12",
+    "supertest": "^6.1.4"
+  },
+  "engines": {
+    "node": "14.17.1"
+  }
+}
