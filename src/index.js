@@ -10,7 +10,8 @@ const { readFile } = require('fs');
 const path = require('path');
 
 const app = require('./server');
-const PORT = config.get('port') || 3000;
+const PORT = process.env.PORT || 8080;
+// const PORT = config.get('port') || 3000;
 // const PORT =  3000;
 
 // in order to user Docker
