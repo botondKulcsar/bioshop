@@ -1,9 +1,9 @@
 {
     "database": {
-        "dbType": "mongodb://",
-        "username": "",
-        "password": "",
-        "host": "mongo:27017/myFirstDatabase?retryWrites=true&w=majority"
+        "dbType": "mongodb+srv://",
+        "username": "remek:",
+        "password": "remek",
+        "host": "@cluster0.z1jxh.mongodb.net/remek?retryWrites=true&w=majority"
     },
-    "port": 3000
+    "port": 8080
 }
