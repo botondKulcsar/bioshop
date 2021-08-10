@@ -1,9 +1,9 @@
 {
     "database": {
-        "dbType": "mongodb://",
-        "username": "",
-        "password": "",
-        "host": "127.0.0.1:27017/remekTest"
+        "dbType": "mongodb+srv://",
+        "username": "remekTest:",
+        "password": "remekTest",
+        "host": "@cluster0.fnkl0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
     },
     "port": 3000
 }

@@ -9,8 +9,12 @@ info:
     email: bkulcsar@gmx.com
 
 servers:
+  - url: https://kecs-bioshop.herokuapp.com
+    description: This is the main server of the Bio-Shop e-commerce webapplication
   - url: http://localhost:3000
-    description: This is the development server of the Bio-Shop e-commerce webapplication
+    description: This is the server of the Bio-Shop e-commerce webapplication in Docker
+  - url: http://localhost:8080
+    description: This is the server of the Bio-Shop e-commerce webapplication in production mode
 
 paths:
   /api/register:

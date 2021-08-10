@@ -18,7 +18,7 @@ const OrderSchema = mongoose.Schema({
             type: String,
             validate: {
                 validator: function(v) {
-                    return /^[A-Za-z\s-]{2,15}$/.test(v)
+                    return /^[A-Za-zíöüóőúéáűÍÖÜÓŐÚÉÁŰ\s-]{2,15}$/.test(v)
                 },
                 message: props => `${props.value} is not a valid first name`
             },
@@ -28,7 +28,7 @@ const OrderSchema = mongoose.Schema({
             type: String,
             validate: {
                 validator: function(v) {
-                    return /^[A-Za-z\s-]{2,15}$/.test(v)
+                    return /^[A-Za-zíöüóőúéáűÍÖÜÓŐÚÉÁŰ\s-]{2,15}$/.test(v)
                 },
                 message: props => `${props.value} is not a valid last name`
             },
@@ -48,7 +48,7 @@ const OrderSchema = mongoose.Schema({
             type: String,
             validate: {
                 validator: function(v) {
-                    return /^[\w\-\s]{2,55}$/.test(v)
+                    return /^[íöüóőúéáűÍÖÜÓŐÚÉÁŰ\w\-\s]{2,55}$/.test(v)
                 },
                 message: props => `${props.value} is not a valid street`
             },
@@ -78,7 +78,7 @@ const OrderSchema = mongoose.Schema({
             type: String,
             validate: {
                 validator: function(v) {
-                    return /^[\w\s\(\)-\.]{1,25}$/.test(v)
+                    return /^[íöüóőúéáűÍÖÜÓŐÚÉÁŰ\w\s\(\)-\.]{1,25}$/.test(v)
                 },
                 message: props => `${props.value} is not a valid city`
             },

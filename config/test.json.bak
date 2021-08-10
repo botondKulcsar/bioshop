@@ -3,7 +3,7 @@
         "dbType": "mongodb://",
         "username": "",
         "password": "",
-        "host": "mongo:27017/myFirstDatabase?retryWrites=true&w=majority"
+        "host": "127.0.0.1:27017/remekTest"
     },
     "port": 3000
 }
